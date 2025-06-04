@@ -51,14 +51,11 @@ def premium(exposure, frequency, severity, risk_load, expense_load):
               type=float,
               required=True,
               help='Mean value for the distribution')
-@click.option('--std-dev',
+@click.option('--std_dev',
               type=float,
               default=None,
               help='Standard deviation (required for normal/lognormal)')
-@click.option('--shape',
-              type=float,
-              default=None,
-              help='Shape parameter (for gamma distribution)')
+
 @click.option('--simulations',
               type=int,
               default=10000,
@@ -67,20 +64,17 @@ def premium(exposure, frequency, severity, risk_load, expense_load):
               type=str,
               default='losses.npy',
               help='Output file path (.npy)')
-def simulate(dist, mean, std_dev, shape, simulations, output):
+def simulate(dist, mean, std_dev, simulations, output):
     """Run Monte Carlo simulation (Enhanced with Gamma and Better Handling)"""
     try:
         model = RiskModel()
         params = {'mean': mean}
         
-        if dist in ['normal', 'lognormal']:
+        if dist in ['normal', 'lognormal','gamma']:
             if std_dev is None:
-                raise click.UsageError(f"--std-dev required for {dist} distribution")
+                raise click.UsageError(f"--std_dev required for {dist} distribution")
             params['std_dev'] = std_dev
-        elif dist == 'gamma':
-            if shape is None:
-                raise click.UsageError("--shape required for gamma distribution")
-            params['shape'] = shape
+      
         
         losses = model.monte_carlo_simulation(
             dist_name=dist,
