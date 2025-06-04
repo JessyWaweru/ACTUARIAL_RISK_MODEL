@@ -1,0 +1,19 @@
+{
+  "file": "losses.npy",
+  "shape": [
+    10000
+  ],
+  "dtype": "int64",
+  "stats": {
+    "min": 0.0,
+    "mean": 5.0202,
+    "max": 15.0
+  },
+  "first_5_values": [
+    8,
+    2,
+    8,
+    3,
+    2
+  ]
+}
