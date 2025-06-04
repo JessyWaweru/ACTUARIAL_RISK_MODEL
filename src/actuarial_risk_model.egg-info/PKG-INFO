@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: actuarial_risk_model
+Version: 0.1.0
+Summary: Actuarial risk modeling toolkit
+Author-email: Your Name <your@email.com>
+License: MIT
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.26
+Requires-Dist: scipy>=1.11
+Requires-Dist: pandas>=2.1
+Requires-Dist: matplotlib>=3.8
+Requires-Dist: click>=8.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: mypy>=1.0; extra == "dev"
+Requires-Dist: pip-tools>=7.0; extra == "dev"
+
+# PY_PROJECTS
