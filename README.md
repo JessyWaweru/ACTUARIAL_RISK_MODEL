@@ -1,110 +1,181 @@
-🌐 Overview
+# 📊 Actuarial Risk Model
+
+> A Python-based actuarial risk modeling toolkit for Monte Carlo simulation, risk metrics, premium pricing, and reinsurance analysis.
+
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/Platform-WSL2%20%7C%20Ubuntu-E95420?style=flat&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat)]()
+
+---
+
+## 🌐 Overview
+
 This repository provides a Python-based actuarial risk modeling toolkit for:
 
-Monte Carlo simulations of insurance losses (normal, Poisson, lognormal distributions)
+- 🎲 **Monte Carlo simulations** of insurance losses (normal, Poisson, lognormal, gamma distributions)
+- 📉 **Risk metrics calculation** — Value-at-Risk (VaR) and Tail VaR (TVaR)
+- 💰 **Premium pricing** with risk and expense loadings
+- 🔁 **Reinsurance layer pricing** with attachment points and limits
+- 📊 **Visualization** of loss distributions
 
-Risk metrics calculation (Value-at-Risk, Tail VaR)
+Built for **Python 3.12+**, optimized for **WSL2/Ubuntu**, and designed for actuarial and data science applications.
 
-Premium pricing with loadings
+---
 
-Visualization of loss distributions
+## ✨ Features
 
-Built for Python 3.12+, optimized for WSL2/Ubuntu, and designed for actuarial/science applications.
+| Feature | Description |
+|---|---|
+| 🎲 Monte Carlo Engine | Simulate 10,000+ scenarios across normal, Poisson, lognormal, and gamma risks |
+| 📉 VaR / TVaR | Calculate 95% / 99% Value-at-Risk and Tail Value-at-Risk |
+| 💰 Premium Calculator | Gross premium with configurable risk and expense loadings |
+| 🖥️ CLI & Web Interface | Run simulations from the terminal or browser |
+| 🔷 Type Hints | Full Python 3.12 type checking for reliability |
 
-✨ Features
+---
 
-Monte Carlo Engine	-- Simulate 10,000+ scenarios for normal/Poisson/lognormal risks
-VaR/TVaR	--Calculate 95%/99% Value-at-Risk and Tail VaR
-Premium Calculator	--Gross premium with risk/expense loadings
-CLI & Web Interface	--Run simulations from terminal or browser
-Type Hints--	Full Python 3.12 type checking for reliability
+## ⚙️ Setup Guide
 
-⚙️ Setup Guide
-1. Prerequisites
-Python 3.12+ (Ubuntu/WSL2 recommended)
+### Prerequisites
 
-pip (modern version)
+- Python 3.12+ (Ubuntu / WSL2 recommended)
+- `pip` (modern version)
 
-2. Installation
-bash
-# Clone repo  
-git clone https://github.com/JessyWaweru/ACTUARIAL_RISK_MODEL.git  
-cd git clone ACTUARIAL_RISK_MODEL  
-  
+### Installation
 
-# Create virtual environment  
-python -m venv venv  
-source venv/bin/activate  
+```bash
+# Clone the repository
+git clone https://github.com/JessyWaweru/ACTUARIAL_RISK_MODEL.git
+cd ACTUARIAL_RISK_MODEL
 
-# Install dependencies  
-pip install -e ".[dev]"  # Installs core + test dependencies  
-3. Verify Installation
-bash
-python -c "from actuarial_risk_model.risk_model import RiskModel; print('Success!')"  
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate
 
-  
-🚀 Usage
-CLI Tool
-bash
-# WHAT YOU CAN CALCULATE;
+# Install core + dev dependencies
+pip install -e ".[dev]"
+```
 
-1. PREMIUM CALCULATIONS
-bash
-python src/actuarial_risk_model/cli.py premium --exposure 100 --frequency 0.1 --severity 5000
-Calculates:
+### Verify Installation
 
-Pure premium = Frequency × Severity
+```bash
+python -c "from actuarial_risk_model.risk_model import RiskModel; print('✅ Success!')"
+```
 
-Gross premium with risk (default: 20%) and expense loadings (default: 15%)
+---
 
-Total premium across all exposure units
+## 🚀 Usage
 
-2. MONTE CARLO SIMULATIONS
-bash
-python src/actuarial_risk_model/cli.py simulate --dist [normal|poisson|lognormal|gamma] --mean X [--std-dev Y] [--shape Z]
-Distributions:
+### 1. 💰 Premium Calculations
 
-Normal (--std-dev required)
+```bash
+python src/actuarial_risk_model/cli.py premium \
+  --exposure 100 \
+  --frequency 0.1 \
+  --severity 5000
+```
 
-Poisson
+**Outputs:**
 
-Lognormal (--std-dev required)
+- Pure premium = Frequency × Severity
+- Gross premium with risk loading (default: 20%) and expense loading (default: 15%)
+- Total premium across all exposure units
 
-Gamma (--shape required)
-Outputs:
+---
 
-NPY file with simulated losses (basically useless so just ignore this file)
+### 2. 🎲 Monte Carlo Simulations
 
-PNG plot of distribution
+```bash
+python src/actuarial_risk_model/cli.py simulate \
+  --dist [normal|poisson|lognormal|gamma] \
+  --mean X \
+  [--std-dev Y] \
+  [--shape Z]
+```
 
-Summary statistics (mean, std dev)
+**Supported distributions:**
 
-3. RISK METRICS
-bash
-python cli.py risk-metrics --loss-file losses.npy --confidence 0.99
-Calculates:
+| Distribution | Required flags |
+|---|---|
+| `normal` | `--std-dev` |
+| `poisson` | — |
+| `lognormal` | `--std-dev` |
+| `gamma` | `--shape` |
 
-Value-at-Risk (VaR) at specified confidence
+**Outputs:**
 
-Tail Value-at-Risk (TVaR)
+- `.npy` file of simulated losses *(intermediate file — safe to ignore)*
+- `.png` plot of the loss distribution
+- Summary statistics: mean, standard deviation
 
-Mean, standard deviation
+---
 
-Maximum/minimum observed loss
+### 3. 📉 Risk Metrics
 
-4. REINSURANCE PRICING
-bash
-python .../cli.py reinsurance --loss-file losses.npy --attachment 1e6 --limit 5e6
-Calculates:
+```bash
+python src/actuarial_risk_model/cli.py risk-metrics \
+  --loss-file losses.npy \
+  --confidence 0.99
+```
 
-Pure premium for the layer
+**Outputs:**
 
-Risk load (20% of standard deviation)
+- Value-at-Risk (VaR) at the specified confidence level
+- Tail Value-at-Risk (TVaR)
+- Mean and standard deviation
+- Maximum and minimum observed loss
 
-Gross premium
+---
 
-Expected loss ratio
+### 4. 🔁 Reinsurance Pricing
 
+```bash
+python src/actuarial_risk_model/cli.py reinsurance \
+  --loss-file losses.npy \
+  --attachment 1e6 \
+  --limit 5e6
+```
 
+**Outputs:**
+
+- Pure premium for the reinsurance layer
+- Risk load (20% of standard deviation)
+- Gross reinsurance premium
+- Expected loss ratio
+
+---
+
+## 📁 Project Structure
 #to inspect losses.npy run this
 python src/actuarial_risk_model/cli.py inspect --filepath losses.npy
+
+ACTUARIAL_RISK_MODEL/
+
+├── src/
+
+│   └── actuarial_risk_model/
+
+│       ├── cli.py            # CLI entry point
+
+│       ├── risk_model.py     # Core RiskModel class
+
+│       └── ...
+
+├── tests/                    # Test suite
+
+├── pyproject.toml            # Project metadata & dependencies
+
+└── README.md
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
+
+---
+
+## 👤 Author
+
+**Jessy Waweru**
+[github.com/JessyWaweru](https://github.com/JessyWaweru)
