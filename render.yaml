@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: actuarial-risk-model-api
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: pip install -e ".[api]"
+    startCommand: uvicorn actuarial_risk_model.api.main:app --app-dir src --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:5173,http://127.0.0.1:5173
