@@ -29,14 +29,21 @@ def build_illustrative_triangle(n_years: int = 5, base_claims: float = 800_000,
         dev_pattern = [0.55, 0.80, 0.92, 0.98, 1.0]
     dev_pattern = list(dev_pattern[:n_years])
     dev_pattern[-1] = 1.0
+    incremental_pattern = [dev_pattern[0]] + [dev_pattern[j] - dev_pattern[j - 1] for j in range(1, n_years)]
 
     rng = np.random.default_rng(seed)
-    ultimate = base_claims * (1 + growth) ** np.arange(n_years) * rng.normal(1.0, 0.05, n_years)
+    ultimate = base_claims * (1 + growth) ** np.arange(n_years)
 
+    # Noise is applied per development cell (not just per accident year) so
+    # development factors actually vary across accident years -- otherwise
+    # Mack's model sees zero residual variance and reports a zero standard error.
     triangle = np.full((n_years, n_years), np.nan)
     for i in range(n_years):
+        cumulative = 0.0
         for j in range(n_years - i):
-            triangle[i, j] = ultimate[i] * dev_pattern[j]
+            increment = max(ultimate[i] * incremental_pattern[j] * rng.normal(1.0, 0.08), 0.0)
+            cumulative += increment
+            triangle[i, j] = cumulative
     return triangle
 
 

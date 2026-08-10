@@ -5,8 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db import init_db
 from .routers import (
+    area_yield,
+    cat_bond,
     credibility,
     extreme_value,
+    health_micro,
+    motor,
     portfolio,
     premium,
     reinsurance,
@@ -16,6 +20,7 @@ from .routers import (
     runs,
     sensitivity,
     simulation,
+    weather_index,
 )
 
 @asynccontextmanager
@@ -52,5 +57,10 @@ for router in (
     ruin.router,
     sensitivity.router,
     runs.router,
+    weather_index.router,
+    area_yield.router,
+    cat_bond.router,
+    motor.router,
+    health_micro.router,
 ):
     app.include_router(router)
