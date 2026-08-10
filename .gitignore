@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+venv/
+*.db
+
+losses.npy
+losses.png
+losses.inspect.json
+
+node_modules/
+frontend/dist/
+frontend/.vite/
