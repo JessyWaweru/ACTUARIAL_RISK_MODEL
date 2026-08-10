@@ -8,7 +8,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![NumPy](https://img.shields.io/badge/NumPy-1.26%2B-013243?logo=numpy&logoColor=white)](https://numpy.org/)
 [![SciPy](https://img.shields.io/badge/SciPy-1.11%2B-8CAAE6?logo=scipy&logoColor=white)](https://scipy.org/)
-[![pytest](https://img.shields.io/badge/tests-64%20passing-brightgreen?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![pytest](https://img.shields.io/badge/tests-101%20passing-brightgreen?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
@@ -36,6 +36,20 @@ A Monte Carlo–driven actuarial risk modeling toolkit covering the core lifecyc
 | 🎚️ **Sensitivity Analysis** | Generic parameter-sweep stress testing over any calculation |
 | 🔌 **REST API** | FastAPI layer exposing every model, with run history persisted via SQLAlchemy |
 
+## 🌍 Real-World Scenarios
+
+Five scenario modules built on the core toolkit above, each priced over **real public data**, not synthetic placeholders (except where noted):
+
+| Scenario | Mechanism | Real data source |
+|---|---|---|
+| 🌧️ **Weather-Index Insurance** | Drought-triggered payout when seasonal rainfall falls below a strike level, for Homa Bay, West Pokot, and Turkana counties | NASA POWER, monthly rainfall 1991-2023 |
+| 🌾 **Area-Yield Crop Insurance** | Payout when a region's average yield falls below a guaranteed fraction of its trend yield | World Bank Open Data, Kenya cereal yield 1961-2023 |
+| 🌊 **Flood Catastrophe Bond** | EVT-driven cat bond pricing (reuses the extreme value module) over rainfall extremes as a flood-severity proxy | NASA POWER, daily rainfall for the Tana River basin (Garissa), 2001-2023 |
+| 🚗 **Motor Insurance (Kenya)** | Frequency/severity pricing by vehicle class with a bonus-malus no-claims discount (reuses the aggregate loss model) | Illustrative, calibrated to documented industry claim patterns — noted in the module docstring |
+| 🏥 **Health Microinsurance** | IBNR reserving (reuses Mack's chain ladder) plus catastrophic/stop-loss cover pricing (reuses the reinsurance layer formula) | Illustrative, calibrated to typical scheme scale — noted in the module docstring |
+
+Raw data pulls and the conversion script live in `data/`, so every number is reproducible from source.
+
 ## 📸 Screenshots
 
 <div align="center">
@@ -49,11 +63,18 @@ A Monte Carlo–driven actuarial risk modeling toolkit covering the core lifecyc
 **Companion frontend — Monte Carlo simulator**
 ![Monte Carlo](docs/screenshots/monte-carlo.png)
 
+**Companion frontend — weather-index insurance (climate shock → payout)**
+![Weather Index](docs/screenshots/weather-index.png)
+
 </div>
 
 ## 🗂️ Project structure
 
 ```
+data/
+├── climate/                # NASA POWER rainfall pulls (raw JSON + converted CSV) + _convert.py
+└── agriculture/            # World Bank Kenya cereal yield pull (raw JSON + converted CSV)
+
 src/actuarial_risk_model/
 ├── risk_model.py           # Core: premium, Monte Carlo, VaR/TVaR, chain ladder
 ├── aggregate_loss.py       # Compound frequency x severity model
@@ -64,6 +85,11 @@ src/actuarial_risk_model/
 ├── reserving.py            # Mack stochastic chain ladder, Bornhuetter-Ferguson
 ├── ruin.py                 # Cramer-Lundberg ruin theory
 ├── sensitivity.py          # Generic sensitivity / stress-test sweeps
+├── weather_index.py        # Rainfall index insurance (real county rainfall)
+├── area_yield.py           # Area-yield crop insurance (real Kenya yield series)
+├── cat_bond.py             # Flood cat bond pricing (reuses extreme_value.py)
+├── motor_insurance.py      # Kenya motor pricing (reuses aggregate_loss.py)
+├── health_micro.py         # Health microinsurance (reuses reserving.py, risk_model.py)
 ├── cli.py                  # Command-line interface
 └── api/                    # FastAPI app
     ├── main.py             # App + router registration
@@ -141,6 +167,11 @@ Interactive docs at **http://127.0.0.1:8000/docs**. Key endpoints:
 | `POST` | `/api/extreme-value/analyze` |
 | `POST` | `/api/ruin/analyze` |
 | `POST` | `/api/sensitivity/premium`, `/var` |
+| `POST` | `/api/weather-index/analyze` |
+| `POST` | `/api/area-yield/analyze` |
+| `POST` | `/api/cat-bond/price` |
+| `POST` | `/api/motor/premium`, `/fleet-simulation` |
+| `POST` | `/api/health-micro/triangle`, `/catastrophic-cover` |
 | `GET/POST/DELETE` | `/api/runs` — saved run history |
 
 The [frontend](https://github.com/JessyWaweru/actuarial_risk_model_frontend) expects this running on `http://127.0.0.1:8000/api`.
