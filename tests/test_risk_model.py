@@ -13,3 +13,16 @@ def test_var_calculation(model: RiskModel) -> None:
 def test_simulation_shape(model: RiskModel) -> None:
     losses = model.monte_carlo_simulation('normal', {'mean': 0, 'std_dev': 1})
     assert losses.shape == (10_000,)
+
+def test_chain_ladder_reserve(model: RiskModel) -> None:
+    triangle = np.array([
+        [100.0, 150.0, 175.0, 180.0],
+        [120.0, 180.0, 200.0, np.nan],
+        [140.0, 200.0, np.nan, np.nan],
+        [130.0, np.nan, np.nan, np.nan],
+    ])
+    total_reserve, dev_factors = model.chain_ladder_reserve(triangle)
+    assert total_reserve > 0
+    assert dev_factors[0] == pytest.approx(530 / 360)
+    assert dev_factors[1] == pytest.approx(375 / 330)
+    assert dev_factors[2] == pytest.approx(180 / 175)

@@ -155,17 +155,23 @@ class RiskModel:
         """
         n = triangle.shape[0]
         dev_factors = np.zeros(n-1)
-        
+
         # Calculate development factors
         for i in range(n-1):
             dev_factors[i] = np.nansum(triangle[:n-i-1, i+1]) / np.nansum(triangle[:n-i-1, i])
-        
-        # Project ultimate claims
-        developed = triangle.copy()
+
+        # Project ultimate claims, filling only the missing (future) cells
+        developed = triangle.astype(float).copy()
         for i in range(1, n):
-            developed[i, i:] = developed[i, i-1] * dev_factors[i-1]
-        
-        return np.nansum(developed[-1, 1:]), dev_factors
+            for j in range(n - i, n):
+                if np.isnan(developed[i, j]):
+                    developed[i, j] = developed[i, j - 1] * dev_factors[j - 1]
+
+        ultimate = developed[:, -1]
+        latest_diagonal = np.array([triangle[i, n - 1 - i] for i in range(n)])
+        total_reserve = np.nansum(ultimate - latest_diagonal)
+
+        return total_reserve, dev_factors
 
     def kupiec_test(self,
                   var: float,
