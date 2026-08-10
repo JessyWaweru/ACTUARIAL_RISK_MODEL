@@ -17,6 +17,8 @@ def convert_monthly(name: str) -> None:
     rows = []
     for key, value in series.items():
         year, month = int(key[:4]), int(key[4:6])
+        if month == 13:  # NASA POWER appends a synthetic annual-average "month"
+            continue
         if value == -999.0:  # NASA POWER fill value
             continue
         rows.append((year, month, value))
@@ -64,7 +66,8 @@ def convert_yield() -> None:
 
 
 if __name__ == "__main__":
-    for county in ("homabay", "westpokot", "turkana", "garissa"):
+    # Garissa only needs the daily series (used for flood/cat-bond EVT), not monthly.
+    for county in ("homabay", "westpokot", "turkana"):
         convert_monthly(county)
     convert_daily("garissa")
     convert_yield()
