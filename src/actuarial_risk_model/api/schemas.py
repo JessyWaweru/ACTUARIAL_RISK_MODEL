@@ -311,6 +311,170 @@ class SensitivityResponse(BaseModel):
     results: List[SensitivityPoint]
 
 
+# === weather-index insurance ===
+
+County = Literal['homabay', 'westpokot', 'turkana']
+
+
+class WeatherIndexRequest(BaseModel):
+    county: County
+    trigger_months: List[int] = [3, 4, 5]  # default: March-April-May "long rains"
+    strike_mm: float = Field(gt=0)
+    exit_mm: float = Field(ge=0)
+    sum_insured: float = Field(gt=0)
+    risk_load: float = 0.2
+    expense_load: float = 0.15
+    simulations: int = 10_000
+    seed: Optional[int] = None
+    confidence: float = 0.95
+
+
+class WeatherIndexResponse(BaseModel):
+    county: str
+    years: List[int]
+    historical_index_mm: List[float]
+    historical_payouts: List[float]
+    fitted_mean_mm: float
+    fitted_std_mm: float
+    pure_premium: float
+    risk_load: float
+    gross_premium: float
+    loss_ratio: float
+    payout_probability: float
+    simulated_mean_payout: float
+    var: float
+    tvar: float
+    histogram: Histogram
+
+
+# === area-yield crop insurance ===
+
+class AreaYieldRequest(BaseModel):
+    coverage_level: float = Field(gt=0, le=1, default=0.8)
+    price_per_kg: float = Field(gt=0)
+    risk_load: float = 0.2
+    expense_load: float = 0.15
+    simulations: int = 10_000
+    seed: Optional[int] = None
+    confidence: float = 0.95
+
+
+class AreaYieldResponse(BaseModel):
+    years: List[int]
+    actual_yield: List[float]
+    trend_yield: List[float]
+    historical_indemnities: List[float]
+    trend_slope: float
+    residual_std: float
+    pure_premium: float
+    risk_load: float
+    gross_premium: float
+    loss_ratio: float
+    var: float
+    tvar: float
+    histogram: Histogram
+
+
+# === flood catastrophe bond ===
+
+class CatBondRequest(BaseModel):
+    threshold_percentile: float = Field(gt=0, lt=100, default=98)
+    attachment_mm: float = Field(gt=0)
+    exhaustion_mm: float = Field(gt=0)
+    principal: float = Field(gt=0)
+    risk_multiple: float = 3.0
+    n_years: int = 10_000
+    seed: Optional[int] = None
+
+
+class CatBondResponse(BaseModel):
+    threshold_mm: float
+    shape: float
+    scale: float
+    exceedance_rate: float
+    n_exceedances: int
+    expected_loss_pct: float
+    expected_loss_amount: float
+    probability_of_attachment: float
+    probability_of_exhaustion: float
+    coupon_spread_pct: float
+    annual_coupon_amount: float
+    histogram: Histogram
+
+
+# === motor insurance ===
+
+VehicleClassName = Literal['private', 'psv', 'commercial', 'motorcycle']
+
+
+class MotorPremiumRequest(BaseModel):
+    vehicle_class: VehicleClassName
+    risk_load: float = 0.25
+    expense_load: float = 0.2
+    claim_free_years: int = 0
+
+
+class MotorPremiumResponse(BaseModel):
+    vehicle_class: str
+    pure_premium: float
+    risk_load: float
+    gross_premium: float
+    discount_pct: float
+    adjusted_premium: float
+
+
+class MotorFleetSimulationRequest(BaseModel):
+    vehicle_class: VehicleClassName
+    n_vehicles: int = Field(gt=0)
+    n_years: int = 10_000
+    seed: Optional[int] = None
+    confidence: float = 0.95
+
+
+class MotorFleetSimulationResponse(BaseModel):
+    mean_annual_claims: float
+    var: float
+    tvar: float
+    histogram: Histogram
+
+
+# === health microinsurance ===
+
+class HealthTriangleRequest(BaseModel):
+    n_years: int = Field(ge=3, le=10, default=5)
+    base_claims: float = Field(gt=0, default=800_000)
+    growth: float = 0.12
+    seed: Optional[int] = None
+
+
+class HealthTriangleResponse(BaseModel):
+    triangle: List[List[Optional[float]]]
+    dev_factors: List[float]
+    ultimate_by_year: List[float]
+    reserve_by_year: List[float]
+    standard_error_by_year: List[float]
+    total_reserve: float
+    total_standard_error: float
+    coefficient_of_variation: float
+
+
+class HealthCatCoverRequest(BaseModel):
+    mean_annual_claims: float = Field(gt=0)
+    cv: float = Field(gt=0, default=0.3)
+    n_years: int = 10_000
+    deductible: float = Field(ge=0)
+    limit: float = Field(gt=0)
+    seed: Optional[int] = None
+
+
+class HealthCatCoverResponse(BaseModel):
+    pure_premium: float
+    risk_load: float
+    gross_premium: float
+    loss_ratio: float
+    histogram: Histogram
+
+
 # === runs (saved history) ===
 
 class RunCreateRequest(BaseModel):
