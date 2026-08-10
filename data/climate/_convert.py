@@ -4,6 +4,7 @@ Run once after re-fetching raw_*.json; not part of the package (data/ is not
 importable), kept here only so the provenance of the committed CSVs is clear
 and reproducible.
 """
+import calendar
 import csv
 import json
 from pathlib import Path
@@ -11,6 +12,11 @@ from pathlib import Path
 HERE = Path(__file__).parent
 
 def convert_monthly(name: str) -> None:
+    """
+    NASA POWER's monthly PRECTOTCORR is mm/day (the average daily rate over
+    that month), not a monthly total -- multiply by the number of days in
+    the month to get actual monthly rainfall in mm.
+    """
     raw = json.loads((HERE / f"rainfall_monthly_{name}_raw.json").read_text())
     series = raw["properties"]["parameter"]["PRECTOTCORR"]
     lat, lon = raw["geometry"]["coordinates"][1], raw["geometry"]["coordinates"][0]
@@ -21,7 +27,8 @@ def convert_monthly(name: str) -> None:
             continue
         if value == -999.0:  # NASA POWER fill value
             continue
-        rows.append((year, month, value))
+        days_in_month = calendar.monthrange(year, month)[1]
+        rows.append((year, month, round(value * days_in_month, 2)))
     rows.sort()
     out = HERE / f"rainfall_monthly_{name}.csv"
     with out.open("w", newline="") as f:
